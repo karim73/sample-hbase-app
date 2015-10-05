@@ -63,6 +63,8 @@ import org.slf4j.LoggerFactory;
  *       mode.
  * 
  * @author david
+ * @see    https://github.com/larsgeorge/hbase-book
+ *         for more Java API code examples.
  */
 public class HBaseApp
 {
