@@ -13,6 +13,45 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <build>
+    <plugins>
+      
+      <!--  Builds a fat jar will all dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <finalName>${artifactId}-${version}-fattyboy</finalName>
+        </configuration>
+      </plugin>
+      
+      <!-- Builds an executable JAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>lib/</classpathPrefix>
+              <mainClass>org.gelog.sys870.hbaseapp.HBaseApp</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      
+    </plugins>
+  </build>
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

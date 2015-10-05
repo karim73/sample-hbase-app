@@ -2,11 +2,14 @@ package org.gelog.sys870.hbaseapp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HRegionInfo;
+import org.apache.hadoop.hbase.HRegionLocation;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
@@ -17,6 +20,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * Development process:
+ * 
+ * 1. Compile on your workstation
+ * 		mvn package
+ * 
+ *      ls -lh target/*.jar
+ *      -rw-r--r-- 1 david staff 8.4K Oct  4 23:29 target/hbase-app-0.0.1-SNAPSHOT.jar
+ *		-rw-r--r-- 1 david staff  31M Oct  4 23:29 target/hbase-app-0.0.1-SNAPSHOT-fattyboy.jar
+ * 
+ * 2. Start a Docker container 
+ * 		docker run --rm -ti \
+ * 			-v $HOME/workspace/ets/sys870/sample-hbase-app/target:/opt/target \
+ * 			hbase bash
+ * 
+ * 3. Run you job as follows:
+ * 		java -jar /opt/target/hbase-app-0.0.1-SNAPSHOT-fattyboy.jar
+ * 
+ * 
+ * IMPROVEMENTS:
+ *    FIXME: Normally, we should be able to run the non-fat jar as follows:
+ *    
+ *    java -cp .:$(hbase classpath) -jar hbase-app-0.0.1-SNAPSHOT.jar
+ * 
+ * @author david
+ */
 public class HBaseApp
 {
 	private static final Logger LOG = LoggerFactory.getLogger(HBaseConfiguration.class);
@@ -45,46 +74,21 @@ public class HBaseApp
 
         
         // Note: Verify that the client can connect to ZooKeeper (normally not required)
+        /*
         System.out.println("Connecting manually to ZooKeeper (not required) ...");
         zkConnectionString = conf.get( "hbase.zookeeper.quorum" );
         testingZooKeeper( zkConnectionString );
-        
+        */
         
         //System.exit(1);
         
         System.out.println("Using HBase client to connect to the ZooKeeper Quorum ...");
         conn	= ConnectionFactory.createConnection( conf );
-    	ScanningMetaTable( conn );
-        
+    	locateTable( conn, "hbase:meta" );
+    	locateTable( conn, "table1" );
+    	locateTable( conn, "default:table1" );
+    	
         System.exit(1);
-    }
-    
-    
-    public void createTable( Connection conn ) throws IOException
-    {
-    	Admin				admin;
-    	String				tableName;
-    	TableName			tableNameH;  // TableName used by HBase (bytes ?)
-    	HTableDescriptor	table;
-    	String				family;
-    	
-    	admin		= conn.getAdmin();
-    	
-    	
-    	tableName	= "demo-table";
-    	tableNameH	= TableName.valueOf( tableName );
-		
-    	if ( admin.tableExists(tableNameH) ) {
-    		System.out.println("Table already exists. Deleting table " + tableName);
-    		admin.disableTable( tableNameH );
-    		admin.deleteTable( tableNameH );
-    	}
-    	
-    	System.out.println("Creating table " + tableName);
-    	family		= "cf";
-    	table		= new HTableDescriptor( tableNameH );
-    	table.addFamily( new HColumnDescriptor( family ) );
-    	admin.createTable( table );
     }
     
     
@@ -114,6 +118,8 @@ public class HBaseApp
 		// Add any necessary configuration files (hbase-site.xml, core-site.xml)
 		//config.addResource(new Path(System.getenv("HBASE_CONF_DIR"), "hbase-site.xml"));
 		//config.addResource(new Path(System.getenv("HADOOP_CONF_DIR"), "core-site.xml"));
+        
+        conf.set("zookeeper.session.timeout", "100");
         
         return conf;
     }
@@ -149,15 +155,59 @@ public class HBaseApp
     }
     
     
-    public void ScanningMetaTable( Connection connection ) throws IOException
+    public void locateTable( Connection connection, String tableName ) throws IOException
     {
-    	String		tableName;
     	TableName	tableNameH;  // TableName used by HBase (bytes ?)
-    	Table		table;
+    	byte[]		startRow;
+    	String		host;
     	
-    	tableName	= "hbase:meta";
+    	List<HRegionLocation>	locations;
+    	HRegionInfo				regionInfo;
+    	
+    	System.out.println("Locating the '" + tableName + "' table ...");
+    	
     	tableNameH	= TableName.valueOf( tableName );
-    	table		= connection.getTable( tableNameH );
-    	connection.getRegionLocator(tableNameH).getRegionLocation("row1".getBytes()).getHostname();
+    	startRow	= null;
+    	locations	= connection.getRegionLocator(tableNameH).getAllRegionLocations();
+    	
+    	for (HRegionLocation location : locations) {
+			host		= location.getHostnamePort();
+			regionInfo	= location.getRegionInfo();
+			startRow	= regionInfo.getStartKey();
+			
+			System.out.printf("\tHost: %s has region #%d starting at row %s\n", 
+					host, 
+					regionInfo.getRegionId(), 
+					startRow );
+			
+			System.out.println( );
+		}
+    }
+    
+    
+    public void createTable( Connection conn ) throws IOException
+    {
+    	Admin				admin;
+    	String				tableName;
+    	TableName			tableNameH;  // TableName used by HBase (bytes ?)
+    	HTableDescriptor	table;
+    	String				family;
+    	
+    	admin		= conn.getAdmin();
+    	
+    	tableName	= "demo-table";
+    	tableNameH	= TableName.valueOf( tableName );
+		
+    	if ( admin.tableExists(tableNameH) ) {
+    		System.out.println("Table already exists. Deleting table " + tableName);
+    		admin.disableTable( tableNameH );
+    		admin.deleteTable( tableNameH );
+    	}
+    	
+    	System.out.println("Creating table " + tableName);
+    	family		= "cf";
+    	table		= new HTableDescriptor( tableNameH );
+    	table.addFamily( new HColumnDescriptor( family ) );
+    	admin.createTable( table );
     }
 }
