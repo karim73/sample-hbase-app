@@ -43,7 +43,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>org.gelog.sys870.hbaseapp.HBaseApp</mainClass>
+              <mainClass>org.gelog.sys870.HBaseApp</mainClass>
             </manifest>
           </archive>
         </configuration>

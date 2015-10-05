@@ -1,4 +1,4 @@
-package org.gelog.sys870.hbaseapp;
+package org.gelog.sys870;
 
 import java.io.File;
 import java.io.IOException;
