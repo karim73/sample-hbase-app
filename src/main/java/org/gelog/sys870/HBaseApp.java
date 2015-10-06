@@ -55,11 +55,11 @@ public class HBaseApp
 
         
         // Note: Verify that the client can connect to ZooKeeper (normally not required)
-        /*
+        ///*
         System.out.println("Connecting manually to ZooKeeper (not required) ...");
         zkConnectionString = conf.get( "hbase.zookeeper.quorum" );
         testingZooKeeper( zkConnectionString );
-        */
+        //*/
         
         //System.exit(1);
         
