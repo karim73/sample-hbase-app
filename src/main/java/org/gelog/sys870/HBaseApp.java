@@ -21,59 +21,6 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Development process:
- * 
- * 1. Compile on your workstation
- * 		Using Maven : 
- * 
- * 		mvn package
- * 
- *      ls -lh target/*.jar
- *      -rw-r--r-- 1 david staff 8.4K Oct  4 23:29 target/hbase-app-0.0.1-SNAPSHOT.jar
- *		-rw-r--r-- 1 david staff  31M Oct  4 23:29 target/hbase-app-0.0.1-SNAPSHOT-fattyboy.jar
- *
- *		
- *		Using graddle :
- *		
- *		(eclipse usage) gradle eclipse 
- *		(idea usage) gradle idea
- *		
- *	    gradle package
- * 
- *      ls -lh build/libs/*.jar
- *		-rw-r--r-- 1 michael michael 37426474  5 oct 23:56 hbase-app-0.0.1-SNAPSHOT-all.jar
- * 
- * 2. Start a Docker container (using gradle, replace absolute path from target  to build/libs)
- * 		docker run --rm -ti \
- * 			-v $HOME/workspace/ets/sys870/sample-hbase-app/target:/opt/target \
- * 			hbase bash
- * 
- * 3. Run you job as follows (builded using gradle ? adapt jar name):
- * 		java -jar /opt/target/hbase-app-0.0.1-SNAPSHOT-fattyboy.jar
- * 
- * 
- * IMPROVEMENTS:
- *    FIXME: Normally, we should be able to run the non-fat jar as follows:
- *    
- *    java -cp .:$(hbase classpath) -jar hbase-app-0.0.1-SNAPSHOT.jar
- *    
- *    but it complains about not being able to find the Hadoop Configuration class.
- * 
- * 
- * TODO: The HBase ZooKeeper IP is hardcoded in src/main/resources.
- *       It would be great to find an elegant way to override this between
- *       local and dev HBase cluster.
- * 
- * TODO: Find a way to connect to Docker container from IDE.
- *       Currently, if I need hardcode the "hbase-master" IP address in /etc/hosts.
- *       It allows connecting to ZooKeeper, but it fails when connecting to HBase
- *       RegionServer. This seems to be because the RegionServer port is always
- *       changing when starting the HBase master, so it is impossible to NAT this
- *       port from the container through the Docker-Machine / Boot2Docker or 
- *       through a remote server.
- *       
- *       The port may be randomly assigned since HBase starts in non-distributed
- *       mode.
  * 
  * @author david
  * @see    https://github.com/larsgeorge/hbase-book

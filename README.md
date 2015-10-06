@@ -51,3 +51,29 @@ docker run --rm -ti \
 ```
 java -jar /opt/target/hbase-app-0.0.1-SNAPSHOT-all.jar
 ```
+
+
+## Improvements
+
+    FIXME: Normally, we should be able to run the non-fat jar as follows:
+    
+    `java -cp .:$(hbase classpath) -jar hbase-app-0.0.1-SNAPSHOT.jar`
+    
+    but it complains about not being able to find the Hadoop Configuration class.
+ 
+ 
+ TODO: The HBase ZooKeeper IP is hardcoded in src/main/resources.
+       It would be great to find an elegant way to override this between
+       local and dev HBase cluster.
+ 
+ TODO: Find a way to connect to Docker container from IDE.
+       Currently, if I need hardcode the "hbase-master" IP address in /etc/hosts.
+       It allows connecting to ZooKeeper, but it fails when connecting to HBase
+       RegionServer. This seems to be because the RegionServer port is always
+       changing when starting the HBase master, so it is impossible to NAT this
+       port from the container through the Docker-Machine / Boot2Docker or 
+       through a remote server.
+       
+       The port may be randomly assigned since HBase starts in non-distributed
+       mode.
+
