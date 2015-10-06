@@ -24,18 +24,31 @@ import org.slf4j.LoggerFactory;
  * Development process:
  * 
  * 1. Compile on your workstation
+ * 		Using Maven : 
+ * 
  * 		mvn package
  * 
  *      ls -lh target/*.jar
  *      -rw-r--r-- 1 david staff 8.4K Oct  4 23:29 target/hbase-app-0.0.1-SNAPSHOT.jar
  *		-rw-r--r-- 1 david staff  31M Oct  4 23:29 target/hbase-app-0.0.1-SNAPSHOT-fattyboy.jar
+ *
+ *		
+ *		Using graddle :
+ *		
+ *		(eclipse usage) gradle eclipse 
+ *		(idea usage) gradle idea
+ *		
+ *	    gradle package
  * 
- * 2. Start a Docker container 
+ *      ls -lh build/libs/*.jar
+ *		-rw-r--r-- 1 michael michael 37426474  5 oct 23:56 hbase-app-0.0.1-SNAPSHOT-all.jar
+ * 
+ * 2. Start a Docker container (using gradle, replace absolute path from target  to build/libs)
  * 		docker run --rm -ti \
  * 			-v $HOME/workspace/ets/sys870/sample-hbase-app/target:/opt/target \
  * 			hbase bash
  * 
- * 3. Run you job as follows:
+ * 3. Run you job as follows (builded using gradle ? adapt jar name):
  * 		java -jar /opt/target/hbase-app-0.0.1-SNAPSHOT-fattyboy.jar
  * 
  * 
