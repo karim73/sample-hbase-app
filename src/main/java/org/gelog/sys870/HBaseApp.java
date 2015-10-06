@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * 			-v $HOME/workspace/ets/sys870/sample-hbase-app/target:/opt/target \
  * 			hbase bash
  * 
- * 3. Run you job as follows:
+ * 3. Run you job as follows (builded using gradle ? adapt jar name):
  * 		java -jar /opt/target/hbase-app-0.0.1-SNAPSHOT-fattyboy.jar
  * 
  * 
