@@ -23,6 +23,9 @@ task Package {
     dependsOn shadowJar
 }
 
+task wrapper(type: Wrapper) {
+   gradleVersion = '2.7' //version required
+}
 
 repositories {
     mavenCentral()
