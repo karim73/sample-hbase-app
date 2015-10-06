@@ -43,7 +43,7 @@ ls -lh build/libs/*.jar
 2) Start a Docker container
 ```
 docker run --rm -ti \
-	-v $HOME/workspace/ets/sys870/sample-hbase-app/target:/opt/target \
+	-v $HOME/workspace/ets/sys870/sample-hbase-app/build/libs:/opt/target \
 	hbase bash
 ```
 
